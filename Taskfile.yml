@@ -1,0 +1,21 @@
+# https://taskfile.dev
+
+version: '3'
+
+vars:
+  GREETING: Hello, World!
+
+tasks:
+  build:
+    cmds:
+      - mkdir -p build
+      - go build -o ./build/go-version-manager ./cmd/go-version-manager/main.go
+    silent: true
+  test:
+    cmds:
+      - echo "{{.GREETING}} Test Task!"
+    silent: true
+  run:
+    cmds:
+      - go run ./cmd/go-version-manager/main.go
+    silent: true
