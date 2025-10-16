@@ -9,7 +9,7 @@ import (
 	"path"
 )
 
-func DownloadGoVersion(version string) (string, error) {
+func GetGoVersion(version string) (string, error) {
 	baseURL := fmt.Sprintf("https://go.dev/dl/go%s.linux-amd64.tar.gz", version)
 	goDownloadDir := ".go-bin/downloads"
 	fileName := fmt.Sprintf("go%s.linux-amd64.tar.gz", version)
