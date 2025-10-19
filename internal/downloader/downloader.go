@@ -9,17 +9,10 @@ import (
 	"path"
 )
 
-func GetGoVersion(version string) (string, error) {
+func GetGoVersion(version string, saveDir string) (string, error) {
 	baseURL := fmt.Sprintf("https://go.dev/dl/go%s.linux-amd64.tar.gz", version)
-	goDownloadDir := ".go-bin/downloads"
 	fileName := fmt.Sprintf("go%s.linux-amd64.tar.gz", version)
-
-	// Get user home directory
-	home, err := os.UserHomeDir()
-	if err != nil {
-		return "", fmt.Errorf("failed to get home directory")
-	}
-	filepath := path.Join(home, goDownloadDir, fileName)
+	filepath := path.Join(saveDir, fileName)
 
 	// Create File to be saved
 	out, err := os.Create(filepath)
