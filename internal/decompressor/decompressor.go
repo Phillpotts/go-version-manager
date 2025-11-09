@@ -4,6 +4,7 @@ package decompressor
 import (
 	"archive/tar"
 	"compress/gzip"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -14,18 +15,29 @@ import (
 // 	return "", nil
 // }
 
-func DecompressSave(compressedFilePath string, destDir string) (string, error) {
+func DecompressSave(compressedFilePath string, destDir string) error {
+	info, err := os.Stat(destDir)
+	if err != nil {
+		if !errors.Is(err, os.ErrNotExist) {
+			return fmt.Errorf("failed to validate version directory: %w", err)
+		}
+	}
+
+	if err == nil && info.IsDir() {
+		return nil
+	}
+
 	// Open the compressed compressed file
 	file, err := os.Open(compressedFilePath)
 	if err != nil {
-		return "", fmt.Errorf("failed to open file: %w", err)
+		return fmt.Errorf("failed to open file: %w", err)
 	}
 	defer file.Close()
 
 	// Create Gzip reader
 	gzReader, err := gzip.NewReader(file)
 	if err != nil {
-		return "", fmt.Errorf("failed to create gzip reader: %w", err)
+		return fmt.Errorf("failed to create gzip reader: %w", err)
 	}
 	defer gzReader.Close()
 
@@ -39,7 +51,7 @@ func DecompressSave(compressedFilePath string, destDir string) (string, error) {
 			break
 		}
 		if err != nil {
-			return "", fmt.Errorf("tar read error: %w", err)
+			return fmt.Errorf("tar read error: %w", err)
 		}
 
 		// Construct the full path
@@ -50,24 +62,24 @@ func DecompressSave(compressedFilePath string, destDir string) (string, error) {
 		case tar.TypeDir:
 			// Create directory
 			if err := os.Mkdir(target, 0o755); err != nil {
-				return "", fmt.Errorf("failed to create a directory: %w", err)
+				return fmt.Errorf("failed to create a directory: %w", err)
 			}
 
 		case tar.TypeReg:
 			// Create parent directories if they don't exist
 			if err := os.MkdirAll(filepath.Dir(target), 0o755); err != nil {
-				return "", fmt.Errorf("failed to create parent directory: %w", err)
+				return fmt.Errorf("failed to create parent directory: %w", err)
 			}
 
 			// Create the file
 			outFile, err := os.Create(target)
 			if err != nil {
-				return "", fmt.Errorf("failed to create file: %w", err)
+				return fmt.Errorf("failed to create file: %w", err)
 			}
 
 			// Copy file content
 			if _, err := io.Copy(outFile, tarReader); err != nil {
-				return "", fmt.Errorf("failed to write file: %w", err)
+				return fmt.Errorf("failed to write file: %w", err)
 			}
 			outFile.Close()
 
@@ -76,5 +88,5 @@ func DecompressSave(compressedFilePath string, destDir string) (string, error) {
 		}
 	}
 
-	return "", nil
+	return nil
 }

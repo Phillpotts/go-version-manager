@@ -24,6 +24,17 @@ func DownloadVersion(service manager.Manager, args []string) error {
 }
 
 func ExtractVersion(service manager.Manager, args []string) error {
-	// Handle and validate args and pass to manager
-	return service.ExtractVersion(args[0])
+	if len(args) == 0 {
+		return fmt.Errorf("usage: extract <version>\nExample: download 1.21.0")
+	}
+
+	version := args[0]
+	fmt.Printf("Extracting Go version %s...\n", version)
+
+	if err := service.ExtractVersion(args[0]); err != nil {
+		return fmt.Errorf("failed to extract version %s: %w", version, err)
+	}
+
+	fmt.Printf("Successfully extract Go %s\n", version)
+	return nil
 }

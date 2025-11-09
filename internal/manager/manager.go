@@ -62,6 +62,6 @@ func (m *Manager) ExtractVersion(version string) error {
 	}
 	// Decompress archived version of GO and save the content to the versioned directory
 	archiveFilePath := m.ArchiveFilePath(version)
-	_, err := decompressor.DecompressSave(archiveFilePath, goVersionPath)
+	err := decompressor.DecompressSave(archiveFilePath, goVersionPath)
 	return err
 }
